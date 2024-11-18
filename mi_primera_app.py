@@ -4,7 +4,7 @@ import streamlit as st
 st.title('Mi primera app')
 
 # Autor de la app
-st.subheader('Esta app fue elaborada por COLOQUE AQUÍ SU NOMBRE.')
+st.subheader('Esta app fue elaborada por Paula Carolina Misas Marín.')
 
 # Solicitar el nombre del usuario
 nombre_usuario = st.text_input('¿Cuál es tu nombre?')
