@@ -11,14 +11,14 @@ if 'finanzas' not in st.session_state:
 
 # Función para agregar un registro
 def agregar_registro(fecha, categoria, presupuestado, real, descripcion):
-    nuevo_registro = {
-        "Fecha": fecha,
-        "Categoría": categoria,
-        "Presupuestado": presupuestado,
-        "Real": real,
-        "Descripción": descripcion
-    }
-    st.session_state.finanzas = st.session_state.finanzas.append(nuevo_registro, ignore_index=True)
+    nuevo_registro = pd.DataFrame({
+        "Fecha": [fecha],
+        "Categoría": [categoria],
+        "Presupuestado": [presupuestado],
+        "Real": [real],
+        "Descripción": [descripcion]
+    })
+    st.session_state.finanzas = pd.concat([st.session_state.finanzas, nuevo_registro], ignore_index=True)
 
 # Mostrar los registros
 def mostrar_registros():
@@ -85,4 +85,3 @@ def calcular_reportes():
 # Calcular y mostrar los reportes
 if st.button("Generar Reportes Financieros"):
     calcular_reportes()
-
