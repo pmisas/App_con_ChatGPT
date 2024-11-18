@@ -1,91 +1,85 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import pydeck as pdk
+from collections import Counter
+import re
 
 # Título de la app
-st.title("Creador de Mapas de Calor para Ciudades Ficticias 🗺️")
-st.write("Genera un mapa de calor interactivo para explorar datos ficticios como densidad de población, tráfico o temperatura.")
+st.title("Explorador de Texto Interactivo 📜")
+st.write("Analiza tus textos con estadísticas detalladas, gráficos interactivos y un análisis de sentimiento más completo. ¡Todo sin necesidad de instalar librerías adicionales!")
 
-# Sidebar para configuración
-st.sidebar.header("Configuración de la Ciudad")
-ciudad = st.sidebar.text_input("Nombre de la ciudad ficticia:", value="Ciudad Ficticia")
-parametro = st.sidebar.selectbox(
-    "Selecciona el parámetro a visualizar:",
-    ["Densidad Poblacional", "Tráfico", "Temperatura"]
-)
-tamano = st.sidebar.selectbox(
-    "Tamaño de la ciudad:",
-    ["Pequeña", "Mediana", "Grande"]
-)
+# Entrada de texto
+st.header("Ingresa tu texto:")
+texto = st.text_area("Escribe o pega tu texto aquí:", height=200)
 
-# Parámetros del tamaño de la ciudad
-if tamano == "Pequeña":
-    num_puntos = 50
-    rango_lat = 0.02
-    rango_lon = 0.02
-elif tamano == "Mediana":
-    num_puntos = 200
-    rango_lat = 0.05
-    rango_lon = 0.05
-else:  # Grande
-    num_puntos = 500
-    rango_lat = 0.1
-    rango_lon = 0.1
+# Función para procesar texto
+def procesar_texto(texto):
+    texto_limpio = re.sub(r'[^\w\s]', '', texto.lower())  # Eliminar puntuación y pasar a minúsculas
+    palabras = texto_limpio.split()
+    frases = re.split(r'[.!?]', texto)
+    frases = [frase.strip() for frase in frases if frase.strip()]  # Eliminar frases vacías
+    return palabras, frases
 
-# Generar datos ficticios
-np.random.seed(42)
-centro_lat, centro_lon = 37.7749, -122.4194  # Coordenadas iniciales (puedes cambiar)
-latitudes = centro_lat + np.random.uniform(-rango_lat, rango_lat, num_puntos)
-longitudes = centro_lon + np.random.uniform(-rango_lon, rango_lon, num_puntos)
+# Función para contar frecuencia de palabras
+def frecuencia_palabras(palabras):
+    return Counter(palabras)
 
-# Crear valores para el parámetro seleccionado
-if parametro == "Densidad Poblacional":
-    valores = np.random.randint(100, 5000, num_puntos)  # Habitantes por zona
-    unidad = "habitantes/km²"
-elif parametro == "Tráfico":
-    valores = np.random.randint(0, 100, num_puntos)  # Congestión en porcentaje
-    unidad = "% de tráfico"
-else:  # Temperatura
-    valores = np.random.normal(25, 5, num_puntos).round(1)  # Temperatura en °C
-    unidad = "°C"
+# Listas extendidas de palabras positivas y negativas
+palabras_positivas = [
+    "bueno", "feliz", "excelente", "maravilloso", "positivo", "genial", "fantástico", "amable",
+    "increíble", "satisfactorio", "amor", "alegría", "contento", "brillante", "esperanza", "éxito"
+]
+palabras_negativas = [
+    "malo", "triste", "horrible", "terrible", "negativo", "decepcionante", "feo", "odioso",
+    "difícil", "fallo", "frustración", "pesimismo", "odio", "sufrimiento", "desgracia", "pérdida"
+]
 
-# Crear DataFrame
-data = pd.DataFrame({
-    "lat": latitudes,
-    "lon": longitudes,
-    "valor": valores
-})
+# Procesamiento del texto
+if texto:
+    palabras, frases = procesar_texto(texto)
+    frecuencia = frecuencia_palabras(palabras)
 
-# Mostrar estadísticas generales
-st.subheader(f"Estadísticas Generales para {ciudad}")
-st.write(f"- **Parámetro visualizado:** {parametro}")
-st.write(f"- **Máximo:** {data['valor'].max()} {unidad}")
-st.write(f"- **Promedio:** {data['valor'].mean():.2f} {unidad}")
-st.write(f"- **Mínimo:** {data['valor'].min()} {unidad}")
+    # Estadísticas básicas
+    st.header("Estadísticas del texto")
+    num_palabras = len(palabras)
+    num_frases = len(frases)
+    num_caracteres = len(texto)
 
-# Crear el mapa de calor
-st.subheader(f"Mapa de Calor para {ciudad}")
-st.pydeck_chart(pdk.Deck(
-    map_style="mapbox://styles/mapbox/light-v9",
-    initial_view_state=pdk.ViewState(
-        latitude=centro_lat,
-        longitude=centro_lon,
-        zoom=12,
-        pitch=50,
-    ),
-    layers=[
-        pdk.Layer(
-            "HeatmapLayer",
-            data=data,
-            get_position="[lon, lat]",
-            get_weight="valor",
-            radius=200,
-            aggregation=pdk.types.String("SUM"),
-        )
-    ],
-))
+    st.write(f"- **Número total de palabras:** {num_palabras}")
+    st.write(f"- **Número total de frases:** {num_frases}")
+    st.write(f"- **Número total de caracteres:** {num_caracteres}")
 
-# Tabla de datos
-st.subheader("Datos Generados")
-st.dataframe(data)
+    # Palabras clave (más frecuentes)
+    st.header("Palabras clave")
+    palabras_clave = pd.DataFrame(frecuencia.most_common(10), columns=["Palabra", "Frecuencia"])
+    st.table(palabras_clave)
+
+    # Gráfico de barras con Streamlit nativo
+    st.header("Frecuencia de palabras")
+    st.bar_chart(data=palabras_clave.set_index("Palabra"))
+
+    # Análisis de sentimiento
+    st.header("Sentimiento del texto")
+    num_positivas = sum(1 for palabra in palabras if palabra in palabras_positivas)
+    num_negativas = sum(1 for palabra in palabras if palabra in palabras_negativas)
+
+    if num_positivas > num_negativas:
+        st.write("El texto tiene un sentimiento general **positivo**. 😊")
+    elif num_negativas > num_positivas:
+        st.write("El texto tiene un sentimiento general **negativo**. 😟")
+    else:
+        st.write("El texto tiene un sentimiento general **neutral**. 😐")
+
+    # Detalles del análisis de sentimiento
+    st.write(f"- **Palabras positivas detectadas:** {num_positivas}")
+    st.write(f"- **Palabras negativas detectadas:** {num_negativas}")
+    st.write(f"- **Palabras sin clasificar:** {num_palabras - (num_positivas + num_negativas)}")
+
+    # Proporción de sentimiento
+    st.header("Proporción de Sentimiento")
+    sentimiento_data = pd.DataFrame({
+        "Sentimiento": ["Positivo", "Negativo", "Neutral"],
+        "Cantidad": [num_positivas, num_negativas, num_palabras - (num_positivas + num_negativas)]
+    })
+    st.bar_chart(sentimiento_data.set_index("Sentimiento"))
+else:
+    st.write("Por favor, ingresa un texto para analizar.")
