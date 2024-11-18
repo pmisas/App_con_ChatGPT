@@ -169,4 +169,54 @@ elif categoria == 'Energía':
         resultado = valor * 0.239006
         st.write(f'{valor} J = {resultado} cal')
     elif conversion_energia == 'Calorías a kilojulios':
-       
+        resultado = valor * 0.004184
+        st.write(f'{valor} cal = {resultado} kJ')
+    elif conversion_energia == 'Kilovatios-hora a megajulios':
+        resultado = valor * 3600
+        st.write(f'{valor} kWh = {resultado} MJ')
+    elif conversion_energia == 'Megajulios a kilovatios-hora':
+        resultado = valor / 3600
+        st.write(f'{valor} MJ = {resultado} kWh')
+
+elif categoria == 'Presión':
+    conversiones_presion = [
+        'Pascales a atmósferas', 'Atmósferas a pascales', 
+        'Barras a libras por pulgada cuadrada', 'Libras por pulgada cuadrada a bares'
+    ]
+    conversion_presion = st.selectbox('Selecciona la conversión', conversiones_presion)
+    valor = st.number_input('Introduce el valor a convertir', float(0))
+    
+    if conversion_presion == 'Pascales a atmósferas':
+        resultado = valor * 9.8692e-6
+        st.write(f'{valor} Pa = {resultado} atm')
+    elif conversion_presion == 'Atmósferas a pascales':
+        resultado = valor / 9.8692e-6
+        st.write(f'{valor} atm = {resultado} Pa')
+    elif conversion_presion == 'Barras a libras por pulgada cuadrada':
+        resultado = valor * 14.5038
+        st.write(f'{valor} bar = {resultado} psi')
+    elif conversion_presion == 'Libras por pulgada cuadrada a bares':
+        resultado = valor / 14.5038
+        st.write(f'{valor} psi = {resultado} bar')
+
+elif categoria == 'Tamaño de Datos':
+    conversiones_datos = [
+        'Megabytes a gigabytes', 'Gigabytes a Terabytes', 
+        'Kilobytes a megabytes', 'Terabytes a petabytes'
+    ]
+    conversion_datos = st.selectbox('Selecciona la conversión', conversiones_datos)
+    valor = st.number_input('Introduce el valor a convertir', float(0))
+    
+    if conversion_datos == 'Megabytes a gigabytes':
+        resultado = valor / 1024
+        st.write(f'{valor} MB = {resultado} GB')
+    elif conversion_datos == 'Gigabytes a Terabytes':
+        resultado = valor / 1024
+        st.write(f'{valor} GB = {resultado} TB')
+    elif conversion_datos == 'Kilobytes a megabytes':
+        resultado = valor / 1024
+        st.write(f'{valor} KB = {resultado} MB')
+    elif conversion_datos == 'Terabytes a petabytes':
+        resultado = valor / 1024
+        st.write(f'{valor} TB = {resultado} PB')
+
