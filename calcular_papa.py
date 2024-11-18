@@ -39,11 +39,23 @@ def calcular_papa_por_tipologia(tipologia):
 
 # Ingresar los datos de la materia
 st.subheader("Agregar nueva materia")
-nombre = st.text_input("Nombre de la materia")
-creditos = st.number_input("Créditos", min_value=1, max_value=12, step=1)
-calificacion = st.number_input("Calificación (0-10)", min_value=0.0, max_value=10.0, step=0.1)
-tipologia = st.selectbox("Tipología de la asignatura", ["Obligatoria", "Optativa", "Libre"])
 
+# Organizar campos en dos columnas
+col1, col2 = st.columns(2)
+
+# En la primera columna, pedimos el nombre de la materia y su tipología
+with col1:
+    nombre = st.text_input("Nombre de la materia")
+with col2:
+    tipologia = st.selectbox("Tipología de la asignatura", ["Obligatoria", "Optativa", "Libre Elección"])
+
+# En la segunda fila, pedimos los créditos y la calificación
+with col1:
+    creditos = st.number_input("Créditos", min_value=1, max_value=12, step=1)
+with col2:
+    calificacion = st.number_input("Calificación (0-5)", min_value=0.0, max_value=5.0, step=0.1)
+
+# Botón para agregar la materia
 if st.button("Agregar materia"):
     agregar_materia(nombre, creditos, calificacion, tipologia)
     st.success("Materia agregada exitosamente")
@@ -58,7 +70,7 @@ if st.button("Calcular PAPA global"):
     st.write(f"PAPA global: {papa_global:.2f}")
 
 # Calcular el PAPA por tipología
-tipologia_seleccionada = st.selectbox("Selecciona una tipología para calcular el PAPA", ["Obligatoria", "Optativa", "Libre"])
+tipologia_seleccionada = st.selectbox("Selecciona una tipología para calcular el PAPA", ["Obligatoria", "Optativa", "Libre Elección"])
 if st.button("Calcular PAPA por tipología"):
     papa_tipologia = calcular_papa_por_tipologia(tipologia_seleccionada)
     st.write(f"PAPA de asignaturas {tipologia_seleccionada}: {papa_tipologia:.2f}")
