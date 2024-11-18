@@ -9,6 +9,9 @@ st.title("Gestor de Finanzas Personales")
 if 'finanzas' not in st.session_state:
     st.session_state.finanzas = pd.DataFrame(columns=["Fecha", "Categoría", "Presupuestado", "Real", "Descripción"])
 
+# Asegurarse de que la columna 'Fecha' sea de tipo datetime
+st.session_state.finanzas['Fecha'] = pd.to_datetime(st.session_state.finanzas['Fecha'], errors='coerce')
+
 # Función para agregar un registro
 def agregar_registro(fecha, categoria, presupuestado, real, descripcion):
     nuevo_registro = pd.DataFrame({
@@ -18,6 +21,7 @@ def agregar_registro(fecha, categoria, presupuestado, real, descripcion):
         "Real": [real],
         "Descripción": [descripcion]
     })
+    nuevo_registro['Fecha'] = pd.to_datetime(nuevo_registro['Fecha'], errors='coerce')  # Convertir la fecha a datetime
     st.session_state.finanzas = pd.concat([st.session_state.finanzas, nuevo_registro], ignore_index=True)
 
 # Mostrar los registros
@@ -53,6 +57,8 @@ def calcular_reportes():
     st.write("### Reporte Mensual")
     mes_actual = datetime.date.today().month
     anio_actual = datetime.date.today().year
+    
+    # Filtrar los registros del mes y año actuales
     registros_mensuales = st.session_state.finanzas[(st.session_state.finanzas['Fecha'].dt.month == mes_actual) & 
                                                    (st.session_state.finanzas['Fecha'].dt.year == anio_actual)]
     
